@@ -20,9 +20,10 @@ The purpose of this exercise is to provide a sample of your work that we can dis
 The following things are considered out of scope for this project, mostly due to time constraints. In a real, production ready project these would all be in scope.
 
 1. Security on endpoints
-2. Extensive automated end-to-end testing
-3. Extensive automated unit testing
-4. Extensive documentation and automated documentation generation
+2. Graceful shutdown
+3. Extensive automated end-to-end testing
+4. Extensive automated unit testing
+5. Extensive documentation and automated documentation generation
 
 ## Endpoint
 Path: `/api/v1/forecast`

@@ -2,7 +2,10 @@ module github.com/kaiiorg/nws-demo-project
 
 go 1.25.3
 
-require github.com/rs/zerolog v1.34.0
+require (
+	github.com/go-chi/chi/v5 v5.2.5
+	github.com/rs/zerolog v1.34.0
+)
 
 require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
