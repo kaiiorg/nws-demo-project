@@ -2,36 +2,18 @@ package main
 
 import (
 	"flag"
-	"time"
-	"os"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"github.com/kaiiorg/nws-demo-project/internal/api"
+	"github.com/kaiiorg/nws-demo-project/internal/config"
 )
 
 var (
-	logLevel = flag.String("log-level", "info", "Set default Zerolog log level: trace, debug, info, warn, error, panic, etc")
+	configPath = flag.String("config-path", "./config.json", "Path to config file")
 )
 
 func main() {
 	flag.Parse()
 	configureLogging()
-
-	log.Info().Msg("hello world")
-}
-
-
-func configureLogging() {
-	zerolog.TimeFieldFormat = time.RFC3339
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
-
-	globalZerologLevel, err := zerolog.ParseLevel(*logLevel)
-	if err != nil || globalZerologLevel == zerolog.NoLevel {
-		log.Warn().
-			Str("configuredLogLevel", *logLevel).
-			Msgf("Log level set to unexpected level; defaulting to %s level", zerolog.InfoLevel.String())
-		globalZerologLevel = zerolog.InfoLevel
-	}
-
-	zerolog.SetGlobalLevel(globalZerologLevel)
+	c := config.LoadConfig(*configPath)
+	api.Run(c)
 }

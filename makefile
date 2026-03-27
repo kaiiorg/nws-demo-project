@@ -4,5 +4,8 @@ build: tidy
 tidy:
 	go mod tidy
 
+fmt:
+	gofmt -w -s .
+
 run:
 	./bin/forecast-api

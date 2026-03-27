@@ -1,6 +1,8 @@
 # Notes
 The following notes are what I'd normally keep in a scratch text document or write on paper. They are included here to get an idea of my thinking process for this project.
 
+This implementation is more complex than is strictly needed, but is closer to what I'd implement for a real application instead of the bare minimum.
+
 ## Requirements as Provided
 Write an HTTP server that serves the forecasted weather. Your server should expose an endpoint that:
 1. Accepts latitude and longitude coordinates
