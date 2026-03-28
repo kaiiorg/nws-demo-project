@@ -10,5 +10,8 @@ fmt:
 run:
 	./bin/forecast-api
 
+test: tidy
+	go test ./...
+
 call:
 	curl localhost:8080/api/v1/forecast

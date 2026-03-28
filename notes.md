@@ -21,8 +21,8 @@ The following things are considered out of scope for this project, mostly due to
 
 1. Security on endpoints
 2. Graceful shutdown
-3. Extensive automated end-to-end testing
-4. Extensive automated unit testing
+3. Extensive end-to-end testing
+4. Extensive unit testing
 5. Extensive documentation and automated documentation generation
 6. Logging in a method that make log aggregation easy
 7. Metrics
@@ -59,16 +59,8 @@ JSON for simplicity, but I'm quite fond of HCL.
     },
     "forecast": {
         // Assumes Fahrenheit as this is the default scale used in the US.
-        "hot": {
-            "min": 90, // Inclusive
-        }, 
-        "moderate": {
-            "max": 90, // Exclusive
-            "min": 60, // Inclusive
-        },
-        "cold": {
-            "max": 60, // Exclusive
-        }
+        "hot": 90, // Exclusive
+        "cold": 60, // Exclusive
     }
 }
 ```

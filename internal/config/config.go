@@ -1,10 +1,8 @@
 package config
 
 var (
-	defaultHotMin      = 90
-	defaultColdMax     = 60
-	defaultModerateMax = defaultHotMin
-	defaultModerateMin = defaultColdMax
+	defaultHot  = 90
+	defaultCold = 60
 )
 
 type Config struct {
@@ -18,10 +16,8 @@ func LoadConfig(path string) *Config {
 	// TODO parse from JSON file
 
 	// Default to sane forecast mappings if we failed to parse the JSON file
-	c.Forecast.Hot.Min = defaultHotMin
-	c.Forecast.Cold.Max = defaultColdMax
-	c.Forecast.Moderate.Max = defaultModerateMax
-	c.Forecast.Moderate.Min = defaultModerateMin
+	c.Forecast.Hot = defaultHot
+	c.Forecast.Cold = defaultCold
 
 	return c
 }

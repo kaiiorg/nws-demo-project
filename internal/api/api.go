@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/kaiiorg/nws-demo-project/internal/api/models"
+	"github.com/kaiiorg/nws-demo-project/internal/characterize"
 	"github.com/kaiiorg/nws-demo-project/internal/config"
 	"github.com/kaiiorg/nws-demo-project/internal/nws"
 
@@ -14,10 +15,17 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var (
+	forecastConfig    *config.Forecast
+	nwsClient         NwsClient     = &nws.NwsClient{}
+	tempCharacterizer Characterizer = &characterize.Characterize{}
+)
+
 func Run(c *config.Config) {
-	log.Info().
-		Uint16("port", c.Api.PortOrDefault()).
-		Msg("hello world from api")
+	// There's probably a better way of doing this with contexts, but this is simple enough for now
+	forecastConfig = &c.Forecast
+
+	log.Info().Uint16("port", c.Api.PortOrDefault()).Msg("API starting")
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -39,21 +47,31 @@ func getForecast(w http.ResponseWriter, r *http.Request) {
 
 	// Sanity check lat/long
 
-	forecast, nwsStatusCode, err := nws.TempForCoords(36.7158451, -91.8739187)
+	forecast, nwsStatusCode, err := nwsClient.TempForCoords(36.7158451, -91.8739187)
 	if err != nil {
 		// Details already logged, we just need to respond to the HTTP request
 		writeError(nwsStatusCode, err, w)
 		return
 	}
 
+	// Characterize temp
+	characterizedTemp := tempCharacterizer.Characterize(forecast.Temperature, forecastConfig)
+
+	result := &models.ForecastResponse{
+		Forecast:          forecast.ShortForecast,
+		Short:             characterizedTemp,
+		TemperatureFormat: "F",
+		Temperature:       forecast.Temperature,
+	}
+
 	log.Info().
-		Int("temperature", forecast.Temperature).
-		Str("shortForecast", forecast.ShortForecast).
+		Int("temperature", result.Temperature).
+		Str("temperatureFormat", result.TemperatureFormat).
+		Str("short", result.Short).
+		Str("forecast", result.Forecast).
 		Msg("got forecast")
 
-	// Characterize temp
-
-	w.Write([]byte("forecast\n"))
+	writeResponse(200, result, w)
 }
 
 func writeError(code int, err error, w http.ResponseWriter) {
@@ -69,6 +87,24 @@ func writeError(code int, err error, w http.ResponseWriter) {
 
 	if code == 0 {
 		code = 500
+	}
+	w.WriteHeader(code)
+	_, err = w.Write(rawBody)
+	if err != nil {
+		// This should never happen
+		panic(err)
+	}
+}
+
+func writeResponse(code int, body interface{}, w http.ResponseWriter) {
+	rawBody, err := json.Marshal(body)
+	if err != nil {
+		// This should never happen
+		panic(err)
+	}
+
+	if code == 0 {
+		code = 200
 	}
 	w.WriteHeader(code)
 	_, err = w.Write(rawBody)

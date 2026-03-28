@@ -21,14 +21,14 @@ var (
 	NoNwsForecast = errors.New("nws returned a response, but it did not contain any forecasts")
 )
 
-func TempForCoords(lat, long float32) (*models.Forecast, int, error) {
+type NwsClient struct{}
+
+func (nwsc *NwsClient) TempForCoords(lat, long float32) (*models.Forecast, int, error) {
 	forecastUrl, nwsStatusCode, err := nwsGridSquare(lat, long)
 	if err != nil {
 		// Already logged details
 		return nil, nwsStatusCode, err
 	}
-
-	log.Info().Str("forecastUrl", forecastUrl).Msg("got NWS grid square with forecast URL")
 
 	f, nwsStatusCode, err := nwsTemp(forecastUrl)
 	if err != nil {

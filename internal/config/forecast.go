@@ -1,12 +1,8 @@
 package config
 
 type Forecast struct {
-	Hot      ForecastCharacterization `json:"hot"`
-	Moderate ForecastCharacterization `json:"moderate"`
-	Cold     ForecastCharacterization `json:"cold"`
-}
-
-type ForecastCharacterization struct {
-	Max int `json:"max,omitempty"`
-	Min int `json:"min,omitempty"`
+	// Hot anything above this value is considered hot, exclusive. Anything between this value and Cold is considered moderate.
+	Hot int `json:"hot"`
+	// Cold anything below this value is considered cold, exclusive. Anything between this value and Hot is considered moderate.
+	Cold int `json:"cold"`
 }
