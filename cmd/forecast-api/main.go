@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	configPath = flag.String("config-path", "./config.json", "Path to config file")
+	configPath = flag.String("config-path", "", "Path to config file")
 )
 
 func main() {

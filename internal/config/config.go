@@ -1,5 +1,9 @@
 package config
 
+import (
+	"github.com/rs/zerolog/log"
+)
+
 var (
 	defaultHot  = 90
 	defaultCold = 60
@@ -13,9 +17,12 @@ type Config struct {
 func LoadConfig(path string) *Config {
 	c := &Config{}
 
-	// TODO parse from JSON file
+	// We could load values from a config file from here, if desired. Not doing it now due to scope.
+	if path != "" {
+		log.Warn().Msg("loading config from a file is out of scope")
+	}
 
-	// Default to sane forecast mappings if we failed to parse the JSON file
+	// Default to sane forecast mappings
 	c.Forecast.Hot = defaultHot
 	c.Forecast.Cold = defaultCold
 

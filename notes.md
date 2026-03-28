@@ -1,5 +1,5 @@
 # Notes
-The following notes are what I'd normally keep in a scratch text document or write on paper. They are included here to get an idea of my thinking process for this project.
+The following notes are what I'd normally keep in a scratch text document, write on paper, or in a ticket. They are included here to get an idea of my thinking process for this project.
 
 This implementation is more complex than is strictly needed, but is closer to what I'd implement for a real application instead of the bare minimum.
 
@@ -26,6 +26,7 @@ The following things are considered out of scope for this project, mostly due to
 5. Extensive documentation and automated documentation generation
 6. Logging in a method that make log aggregation easy
 7. Metrics
+8. Config file
 
 ## Endpoint
 Path: `/api/v1/forecast`
@@ -43,10 +44,10 @@ Body:
     2. longitude: -180.0 < Y > 180.0
 2. API call to NWS /points/{latitude},{longitude}
     1. If not 200, return error to caller
-3. Parse API call results for "gridId", "gridX", "gridY", "forecast" values
-4. API call to NWS using "forcase" result, which includes "gridId", "gridX", "gridY"
+3. Parse API call results for "forecast" values
+4. API call to NWS using "forcast" result
     1. If not 200, return error to caller
-5. Parse API call results for "temperature" and "temperatureUnit"
+5. Parse API call results for "temperature" and forecast
 6. Map value to configured "characterization" ranges from config file
 
 ## Config
