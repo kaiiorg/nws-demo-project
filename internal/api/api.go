@@ -2,11 +2,13 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/kaiiorg/nws-demo-project/internal/api/models"
-	"github.com/kaiiorg/nws-demo-project/internal/characterize"
+	"github.com/kaiiorg/nws-demo-project/internal/characterizer"
 	"github.com/kaiiorg/nws-demo-project/internal/config"
 	"github.com/kaiiorg/nws-demo-project/internal/nws"
 
@@ -21,6 +23,11 @@ var (
 	tempCharacterizer Characterizer = &characterize.Characterize{}
 )
 
+var (
+	ErrInvalidLatitude  = errors.New("invalid latitude")
+	ErrInvalidLongitude = errors.New("invalid longitude")
+)
+
 func Run(c *config.Config) {
 	// There's probably a better way of doing this with contexts, but this is simple enough for now
 	forecastConfig = &c.Forecast
@@ -31,7 +38,7 @@ func Run(c *config.Config) {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	r.Get("/api/v1/forecast", getForecast)
+	r.Post("/api/v1/forecast", postForecast)
 
 	err := http.ListenAndServe(
 		fmt.Sprintf(":%d", c.Api.PortOrDefault()),
@@ -42,12 +49,35 @@ func Run(c *config.Config) {
 	}
 }
 
-func getForecast(w http.ResponseWriter, r *http.Request) {
+func postForecast(w http.ResponseWriter, r *http.Request) {
+	// Read request body
+	rawBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to read request body")
+		writeError(500, err, w)
+		return
+	}
+
 	// Parse lat/long
+	coords := &models.Coords{}
+	err = json.Unmarshal(rawBody, coords)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to parse request body")
+		// Logging the raw body would be a good thing to do here for a real application having an issue, but need to keep in mind that bodies may contain sensitive info and large bodies may stress our log aggregation, not to mention security
+		writeError(500, err, w)
+		return
+	}
 
 	// Sanity check lat/long
+	err = latLongSanityCheck(coords)
+	if err != nil {
+		log.Error().Err(err).Msg("given invalid coordinates")
+		// Logging the raw body would be a good thing to do here for a real application having an issue, but need to keep in mind that bodies may contain sensitive info and large bodies may stress our log aggregation, not to mention security
+		writeError(400, err, w)
+		return
+	}
 
-	forecast, nwsStatusCode, err := nwsClient.TempForCoords(36.7158451, -91.8739187)
+	forecast, nwsStatusCode, err := nwsClient.TempForCoords(coords.Latitude, coords.Longitude)
 	if err != nil {
 		// Details already logged, we just need to respond to the HTTP request
 		writeError(nwsStatusCode, err, w)
@@ -72,6 +102,16 @@ func getForecast(w http.ResponseWriter, r *http.Request) {
 		Msg("got forecast")
 
 	writeResponse(200, result, w)
+}
+
+func latLongSanityCheck(coords *models.Coords) error {
+	switch {
+	case coords.Latitude < -90.0, coords.Latitude > 90.0:
+		return ErrInvalidLatitude
+	case coords.Longitude < -180.0, coords.Longitude > 180:
+		return ErrInvalidLongitude
+	}
+	return nil
 }
 
 func writeError(code int, err error, w http.ResponseWriter) {
