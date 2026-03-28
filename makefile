@@ -1,4 +1,5 @@
 build: tidy
+	mkdir ./bin
 	go build -o ./bin ./cmd/forecast-api
 
 tidy:
