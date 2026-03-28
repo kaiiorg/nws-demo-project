@@ -24,6 +24,8 @@ The following things are considered out of scope for this project, mostly due to
 3. Extensive automated end-to-end testing
 4. Extensive automated unit testing
 5. Extensive documentation and automated documentation generation
+6. Logging in a method that make log aggregation easy
+7. Metrics
 
 ## Endpoint
 Path: `/api/v1/forecast`
@@ -58,14 +60,14 @@ JSON for simplicity, but I'm quite fond of HCL.
     "forecast": {
         // Assumes Fahrenheit as this is the default scale used in the US.
         "hot": {
-            "min": 90,  // Inclusive, leave undefined define this as the bottom range value
+            "min": 90, // Inclusive
         }, 
         "moderate": {
-            "max": 90,  // Exclusive, leave undefined define this as the top range value
-            "min": 60,  // Inclusive, leave undefined define this as the bottom range value
+            "max": 90, // Exclusive
+            "min": 60, // Inclusive
         },
         "cold": {
-            "max": 60,  // Exclusive, leave undefined define this as the top range value
+            "max": 60, // Exclusive
         }
     }
 }
@@ -76,3 +78,7 @@ JSON for simplicity, but I'm quite fond of HCL.
 2. Allow user to make request in different coordinate systems, such as a given state plane
 3. Allow administrator to define forecast mappings in Celsius
 4. Cache results for a configurable amount of time to limit load on NWS resources and speed up response times
+5. Better configuration method for more characterizations by configuration without code changes
+6. Request IDs, using those IDs in logs, and returning them on errors to help future debugging
+7. Don't expose NWS error messages or codes
+8. Don't log coordinates or anything that can relate back to them; they count as PII in some jurisdictions

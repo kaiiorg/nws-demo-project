@@ -1,9 +1,12 @@
 package config
 
 type Forecast struct {
-	// Exclusive, leave undefined define this as the top range value
-	Max *int `json:"max,omitempty"`
+	Hot      ForecastCharacterization `json:"hot"`
+	Moderate ForecastCharacterization `json:"moderate"`
+	Cold     ForecastCharacterization `json:"cold"`
+}
 
-	// Inclusive, leave undefined define this as the bottom range value
-	Min *int `json:"min,omitempty"`
+type ForecastCharacterization struct {
+	Max int `json:"max,omitempty"`
+	Min int `json:"min,omitempty"`
 }
